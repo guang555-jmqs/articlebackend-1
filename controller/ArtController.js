@@ -37,7 +37,6 @@ ArticleController.allArticle = async (req,res)=>{
         data: data,
         msg:''
     }
-    // console.log(data)
     res.json(response)
     // res.json(articleData)
 }
@@ -46,7 +45,6 @@ ArticleController.allArticle = async (req,res)=>{
 //删除文章
 ArticleController.delArticle = async (req,res)=>{
     let {art_id} = req.body;
-    console.log(art_id)
     let sql = `delete from article where art_id = ${art_id}`;
     let result = await model(sql);
     if(result.affectedRows){
@@ -83,7 +81,7 @@ ArticleController.postArt = async (req,res)=>{
 
 //实现文件上传
 ArticleController.upload = (req,res)=>{
-    console.log(req.file); //接收文件上传成功后的信息
+    //console.log(req.file); //接收文件上传成功后的信息
     if(req.file){
         // 进行文件的重命名即可 fs.rename
         let {originalname,destination,filename} = req.file;
@@ -106,6 +104,35 @@ ArticleController.getOneArt = async (req,res)=>{
     let sql = `select * from article where art_id = ${art_id}`;
     let data = await model(sql); // [{}]
     res.json(data[0] || {})
+
+}
+
+
+// 编辑文章数据入库
+ArticleController.updArt = async (req,res)=>{
+    //1.接收post数据(校验)
+    let {cover,title,cat_id,art_id,content,status,oldCover} = req.body
+    //2.执行sql语句
+    let sql;
+    if(cover){
+        // 有值更新图片，且要删除原图
+        sql = `update article set title='${title}',content='${content}',cover='${cover}'
+                ,cat_id=${cat_id},status = ${status} where art_id = ${art_id};`
+    }else{
+        // 没有值，则保留原图片
+        sql = `update article set title='${title}',content='${content}'
+                ,cat_id=${cat_id},status = ${status} where art_id = ${art_id};`
+    }
+    let result = await model(sql);
+    
+    //3.响应结果
+    if(result.affectedRows){
+        // 成功之后，删除原图
+        cover && fs.unlinkSync(oldCover)
+        res.json(updsucc)
+    }else{
+        res.json(updfail)
+    }
 
 }
 

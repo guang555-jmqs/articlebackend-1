@@ -79,6 +79,10 @@ router.post('/upload',upload.single('file'),ArtController.upload)
 router.get('/getOneArt',ArtController.getOneArt)
 
 
+// 编辑文章的数据接口
+router.post('/updArt',ArtController.updArt)
+
+
 // 匹配失败的路由
 router.all('*',(req,res)=>{
     res.json({errcode:10004,message:"请求错误"})

@@ -140,10 +140,14 @@
   //监听提交
   // lay-filter="formDemo"
   form.on('submit(formDemo)', function(data){
-    let formData = data.field;
+    let formData = data.field; // 收集表单数据（必须含有name属性）
     formData.content = editor.txt.html(); //获取编辑器内容
-    // 发送ajax请求，入库数据即可
-    $.post('/postArt',formData,({errcode,message})=>{
+    // 设置编辑文章的id
+    formData.art_id = art_id;
+    formData.oldCover= oldCover;
+    
+    // 发送ajax请求，入库编辑数据即可
+    $.post('/updArt',formData,({errcode,message})=>{
       if(errcode == 0){
         location.href = '/artindex';
       }
@@ -171,15 +175,17 @@
   }
   loadCate();
 
-  // 1在获取当前文章的数据
+  // 在获取当前文章的数据
+  let oldCover; // 保存原图路径
   function getEditArt(){
     // 发送ajax获取当前文章的数据,进行数据的表单回显
     $.get('/getOneArt',{art_id},(res)=>{
       console.log(res)
         let {title,content,status,cover,cat_id} = res;
-        cover && $('#cover-preview').attr('src',cover)
-        editor.txt.html(content)
-        // 给表单赋值
+        cover && $('#cover-preview').attr('src',cover); //图片回显
+        oldCover = cover; //记录原图的路径，
+        editor.txt.html(content); // 设置富文本编辑器内容
+        // 给表单赋值（对象的键名和必须和表单的name字段一致）
         form.val('formDemo',{
           title,
           status,
