@@ -111,9 +111,9 @@ app.use(router)
 ## 数据可视化-echarts使用
 
 - 基本步骤
-文档：https://echarts.apache.org/zh/api.html#echarts 
-如果快速入门建议查看菜鸟教程：https://www.runoob.com/echarts/echarts-tutorial.html
-熟悉基本使用之后，再去看官网api手册
+- 文档：https://echarts.apache.org/zh/api.html#echarts 
+- 快速入门建议查看菜鸟教程：https://www.runoob.com/echarts/echarts-tutorial.html
+- 熟悉基本使用之后，再去看官网api手册
 
 如下基本用法：
 ```html
@@ -173,4 +173,4 @@ LEFT JOIN category t2 ON t1.cat_id = t2.cat_id
 GROUP BY
 	t1.cat_id;
 ```
-- 需求2：统计出当前每月的文章数
+- 需求2：统计出每月的文章数
