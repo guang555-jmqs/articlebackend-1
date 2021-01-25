@@ -11,10 +11,15 @@ let upload = multer({ dest: 'uploads/' })
 // 导入相应的控制器
 const CateController = require('../controller/CateController.js');
 const ArtController = require('../controller/ArtController.js');
+const UserController = require('../controller/UserController.js');
 
 // 匹配 / 或 /admin
 router.get(/^\/$|^\/admin$/,(req,res)=>{
-    res.render('index.html')
+    console.log(req.session.userInfo)
+    let data = {
+        userInfo:req.session.userInfo
+    }
+    res.render('index.html',data)
 })
 
 // 文章列表
@@ -82,6 +87,29 @@ router.get('/getOneArt',ArtController.getOneArt)
 // 编辑文章的数据接口
 router.post('/updArt',ArtController.updArt)
 
+
+// 渲染用户登录页面
+router.get('/login',(req,res)=>{
+    // 如果有用户的信息，用户再次访问/login，则直接帮他重定向到首页
+    if(req.session.userInfo){
+        res.redirect('/');
+        return
+    }
+    res.render('login.html')
+})
+
+// 用户登录
+router.post('/signin',UserController.signin)
+
+
+// 用户退出
+router.get('/logout',(req,res)=>{
+    // 清空session并重定向到登录页面
+    req.session.destroy(err=>{
+        if(err){ throw err; }
+    })
+    res.redirect('/login');
+})
 
 // 匹配失败的路由
 router.all('*',(req,res)=>{
