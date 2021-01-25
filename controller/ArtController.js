@@ -56,11 +56,19 @@ ArticleController.delArticle = async (req,res)=>{
 
 // 渲染出文章编辑的页面
 ArticleController.artEdit = (req,res)=>{
+    // // 判断是否有权限
+    // if(!req.session.userInfo){
+    //     res.send('你想翻墙没门');return;
+    // }
     res.render('article-edit.html')
 }
 
 // 渲染出文章添加的页面
 ArticleController.artAdd = (req,res)=>{
+    // // 判断是否有权限
+    // if(!req.session.userInfo){
+    //     res.send('你想翻墙没门');return;
+    // }
     res.render('article-add.html')
 }
 

@@ -45,6 +45,26 @@ let options = {
 };
 app.use( session(options) )
 
+// 在进入到路由匹配函数之前，要进行验证权限
+app.use(function(req,res,next){
+    // 1.获取当前访问路由
+    let path = req.path.toLowerCase();
+    // 2. 定义放行的路由，即不需要权限验证
+    let noCheckAuth = ['/login','/signin','/logout']
+    if(noCheckAuth.includes(path)){
+        // 需要放行,不做任何限制
+        next();
+    }else{
+        // 不在放行之外，需要验证权限（session）
+        // addArt
+        if(req.session.userInfo){
+            // 有权限，可以继续操作
+            next()
+        }else{
+            res.redirect('/login')
+        }
+    }
+});
 
 // 使用路由中间件 req.body
 app.use(router)
