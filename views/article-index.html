@@ -23,13 +23,6 @@
       <!-- 内容主体区域 -->
 
       <div style="padding: 15px;">
-        <h2>文章管理</h2>
-        <div>
-            <button type="button" id="add"  class="layui-btn">
-                <i class="layui-icon">&#xe608;</i> 添加文章
-            </button>
-        </div>
-       
         <table class="layui-hide" id="test" lay-filter="test"></table>
       </div>
 
@@ -38,6 +31,37 @@
         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
       </script> -->
+
+      <script type="text/html" id="toolbarDemo">
+        <div style="display:flex">
+            <div  style="margin-right:50px">
+              <button type="button" id="add" class="layui-btn layui-btn-normal">
+                <i class="layui-icon">&#xe608;</i> 添加文章
+              </button>
+            </div>
+            <div style="display:flex;">
+              <div class="layui-form-item">
+                <label class="layui-form-label">标题</label>
+                <div class="layui-inline">
+                  <input class="layui-input" name="title" id="title" autocomplete="off">
+                </div>
+              </div>
+              <div class="layui-form-item">
+                  <label class="layui-form-label">状态</label>
+                  <div class="layui-input-inline">
+                    <select id="status" name="status">
+                      <option value="">全部</option>
+                      <option value="0">未发布</option>
+                      <option value="1">已发布</option>
+                      <option value="2">未通过</option>
+                    </select>
+                  </div>
+                </div>
+              
+              <button class="layui-btn" id="search">搜索</button>
+            </div>
+        </div>
+      </script>
 
 
     </div>
@@ -49,16 +73,6 @@
   {{ include './common/scriptjs.html' }}
   <script src="/public/js/lightbox-plus-jquery.min.js"></script>
   <script>
-    // NProgress.set(0.4);// 默认设置40% NProgress.set(0) 等价与 NProgress.start()
-    // let interval = setInterval(function(){
-    //     NProgress.inc(); // 以小量递增
-    // },200)
-
-    // $(window).on('load',()=>{
-    //     clearInterval(interval)
-    //     NProgress.done()
-    // })
-
     //JavaScript代码区域
     layui.use(['element', 'table'], function () {
       var element = layui.element;
@@ -66,6 +80,7 @@
 
       let tableUI = table.render({
         elem: '#test',
+        id:"reload",
         url: '/allarticle',
         cellMinWidth: 100,
         toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
@@ -98,7 +113,7 @@
             width: 80,
             fixed: 'left',
             unresize: true,
-            hide:true
+            hide: true
           }, {
             field: 'title',
             title: '标题',
@@ -108,7 +123,7 @@
             field: 'content',
             title: '内容',
             width: 120,
-            hide:true
+            hide: true
           }, {
             field: 'name',
             title: '所属分类',
@@ -123,7 +138,9 @@
             field: 'cover',
             title: '封面',
             width: 100,
-            templet({cover}){
+            templet({
+              cover
+            }) {
               let imgStr = `<a class="example-image-link" href="${cover}" data-lightbox="example-1" data-title="我帅木">
                         <img class="example-image" src="${cover}" alt="暂无图片" />
                     </a>`;
@@ -156,10 +173,12 @@
             fixed: 'right',
             title: '操作',
             // toolbar: '#barDemo',1
-            templet({status}){
+            templet({
+              status
+            }) {
               let temStr = `<a class="layui-btn layui-btn-xs" lay-event="show">查看内容</a>`;
               // 当前状态是0，说明是未发布，我们可以对其进行审核
-              switch(status){
+              switch (status) {
                 case 0: // 未发布 
                   temStr += `<a class="layui-btn layui-btn-xs layui-bg-orange" lay-event="verify">待审核</a>`
                   break;
@@ -167,7 +186,7 @@
                   break;
               }
 
-               temStr += ` 
+              temStr += ` 
                   <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
                   <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>`
               return temStr;
@@ -196,7 +215,11 @@
           event
         } = obj;
         // data就是当前的一行记录
-        let {art_id,title,content} = data;
+        let {
+          art_id,
+          title,
+          content
+        } = data;
         switch (event) {
           case "del": // 删除
             del(art_id)
@@ -208,7 +231,7 @@
             verify(art_id)
             break;
           case "show": // 待审核
-            showContent(title,content)
+            showContent(title, content)
             break;
 
         }
@@ -217,77 +240,102 @@
 
       });
       //弹框显示文章内容
-      function showContent(title,content){
+      function showContent(title, content) {
         layer.open({
-            title:title,
-            type: 1,
-            skin: 'layui-layer-rim', //加上边框
-            area: ['1100px', '640px'], //宽高
-            content: "<div style='padding:10px'>" + content + "</div>"
-          });
+          title: title,
+          type: 1,
+          skin: 'layui-layer-rim', //加上边框
+          area: ['1100px', '640px'], //宽高
+          content: "<div style='padding:10px'>" + content + "</div>"
+        });
       }
 
       // 删除文章
       function del(art_id) {
-            layer.confirm('确认删除', {
-                btn: ['是的', '取消?'] //按钮
-            }, function () {
-                 // 发送ajax请求
-                $.ajax({
-                    type:'post',
-                    url:"/delArticle",
-                    data:{art_id},
-                    success({errcode,message}){ // 解构形参对象的参数
-                        // let {errcode,message} = res;
-                        layer.closeAll();
-                        if(errcode == 0){
-                            tableUI.reload(); // 只是重载表格（局部刷新）
-                            // location.reload() 刷新当前网页
-                            layer.msg(message)
-                        }
-                    }
-                })
-            });
+        layer.confirm('确认删除', {
+          btn: ['是的', '取消?'] //按钮
+        }, function () {
+          // 发送ajax请求
+          $.ajax({
+            type: 'post',
+            url: "/delArticle",
+            data: {
+              art_id
+            },
+            success({
+              errcode,
+              message
+            }) { // 解构形参对象的参数
+              // let {errcode,message} = res;
+              layer.closeAll();
+              if (errcode == 0) {
+                tableUI.reload(); // 只是重载表格（局部刷新）
+                // location.reload() 刷新当前网页
+                layer.msg(message)
+              }
+            }
+          })
+        });
       }
 
       // 跳转到文章编辑页面
-      function edit(art_id){
+      function edit(art_id) {
         // 需要把id携带过去
         location.href = `/artedit?art_id=${art_id}`
       }
 
       // 审核文章 发送ajax请求，修改文章的状态
-      function verify(art_id){
+      function verify(art_id) {
         //询问框
-      layer.confirm('是否通过审核', {
-          btn: ['通过','不通过'] //按钮
-        }, function(){
+        layer.confirm('是否通过审核', {
+          btn: ['通过', '不通过'] //按钮
+        }, function () {
           // 通过 => status 1
-          updArtStatus(art_id,1)
-        }, function(){
+          updArtStatus(art_id, 1)
+        }, function () {
           // 不通过 => status  2
-          updArtStatus(art_id,2)
-         
+          updArtStatus(art_id, 2)
+
         });
       }
 
-
-
       // 更新文章状态
-      function updArtStatus(art_id,status){
-        $.post('/updstatus',{art_id,status},({errcode,message})=>{
-          if(errcode == 0){
+      function updArtStatus(art_id, status) {
+        $.post('/updstatus', {
+          art_id,
+          status
+        }, ({
+          errcode,
+          message
+        }) => {
+          if (errcode == 0) {
             tableUI.reload(); // 只是重载表格（局部刷新）
           }
           layer.msg(message)
-        },'json')
+        }, 'json')
       }
 
-      
-
       // 跳转到文章添加页面
-      $("#add").on('click',()=>{
+      $("#add").on('click', () => {
         location.href = '/addart'
+      })
+
+      // 搜索重载
+      $("body").on('click','#search',()=>{
+		// 执行表格重载
+		let title = $('#title').val()
+		let status = $('#status').val()
+        table.reload('reload', {
+          page: {
+            curr: 1 //重新从第 1 页开始
+          }
+          ,where: {
+			title,
+			status
+          }
+		});
+		$('#title').val(title)
+		$('#status').val(status)
       })
 
     });

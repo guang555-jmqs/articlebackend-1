@@ -101,72 +101,66 @@
     const editor = new E('#content')
     editor.config.uploadImgShowBase64 = true; // 可以实现手动上传图片(转换成base64格式)
     editor.create()
-//JavaScript代码区域
-layui.use(['element','form','layer','upload'], function(){
-  var element = layui.element;
-  var layer = layui.layer;
+    //JavaScript代码区域
+    layui.use(['element','form','layer','upload'], function(){
+        var element = layui.element;
+        var layer = layui.layer;
 
-  var form = layui.form;
-  var upload = layui.upload;
-   
-  //执行实例
-  var uploadInst = upload.render({
-    elem: '#cover_img_upload' //绑定元素
-    ,url: '/upload/' //上传接口
-    ,done: function({code,message,src}){
-      //上传完毕回调
-      if(code == 0){
-        // 1.图片预览 2.把图片路径设置到表单隐藏域提交到后台
-        $('#cover-preview').attr('src',src).css('width','100')
-        $("input[name='cover']").val(src)
-      }
-    }
-    ,error: function(){
-      //请求异常回调
-    }
-  });
-  
-  //监听提交
-  // lay-filter="formDemo"
-  form.on('submit(formDemo)', function(data){
-    let formData = data.field;
-    formData.content = editor.txt.html(); //获取编辑器内容
-    // 发送ajax请求，入库数据即可
-    $.post('/postArt',formData,({errcode,message})=>{
-      if(errcode == 0){
-        location.href = '/artindex';
-      }
-      layer.msg(message)
-    },'json')
-    return false;
-  });
+        var form = layui.form;
+        var upload = layui.upload;
+        
+        //执行实例
+        var uploadInst = upload.render({
+          elem: '#cover_img_upload' //绑定元素
+          ,url: '/upload/' //上传接口
+          ,done: function({code,message,src}){
+            //上传完毕回调
+            if(code == 0){
+              // 1.图片预览 2.把图片路径设置到表单隐藏域提交到后台
+              $('#cover-preview').attr('src',src).css('width','100')
+              $("input[name='cover']").val(src)
+            }
+          }
+          ,error: function(){
+            //请求异常回调
+          }
+        });
+        
+        //监听提交
+        // lay-filter="formDemo"
+        form.on('submit(formDemo)', function(data){
+          let formData = data.field;
+          formData.content = editor.txt.html(); //获取编辑器内容
+          // 发送ajax请求，入库数据即可
+          $.post('/postArt',formData,({errcode,message})=>{
+            if(errcode == 0){
+              location.href = '/artindex';
+            }
+            layer.msg(message)
+          },'json')
+          return false;
+        });
 
-  //加载所有的分类
-  function loadCate(){
-    $.get('/getCate',(res)=>{
-      
-      let optionStr = `<option value=""></option>`;
-      res.forEach(v=>{
-        optionStr += `<option value="${v.cat_id}">${v.name}</option>`
-      })
-      // 赋值给下拉框select
-      // optionStr是属于ajax动态生成的
-      $("#cat_id").html(optionStr);
-      form.render(); // 重新渲染
+        //加载所有的分类
+        function loadCate(){
+          $.get('/getCate',(res)=>{
+            
+            let optionStr = `<option value=""></option>`;
+            res.forEach(v=>{
+              optionStr += `<option value="${v.cat_id}">${v.name}</option>`
+            })
+            // 赋值给下拉框select
+            // optionStr是属于ajax动态生成的
+            $("#cat_id").html(optionStr);
+            form.render(); // 重新渲染
 
-   
-    },'json')
-  }
-  loadCate();
+        
+          },'json')
+        }
+        loadCate();
 
-  // 给表单赋值
-  // form.val('formDemo',{
-  //   title: '你好',
-  //   status: 1,
-  //   cat_id: 1
-  // })
-  
-});
+ 
+    });
 </script>
 </body>
 </html>
