@@ -3,13 +3,16 @@
 let UserController = {};
 // 导入model,相当于模型执行sql语句，
 const model = require('../model/model.js');
+let md5 = require('md5')
+let {secret:passSecret} = require('../config/app.json')
 
 //登录接口
 UserController.signin = async (req,res)=>{
    
     //1.接收参数
     let {username,password} = req.body;
-    //2.数据库查询
+    //2.数据库查询,要把密码md5加密之后在判断
+    password = md5(`${password}${passSecret}`);
     let sql = `select * from users where username='${username}' and password = '${password}'`
     let data = await model(sql);// [{}]
     //3.响应结果

@@ -6,8 +6,6 @@ let session = require('express-session');
 
 
 
-
-
 // 导入路由模块
 const router = require('./router/router.js')
 
@@ -61,7 +59,8 @@ app.use(function(req,res,next){
             // 有权限，可以继续操作
             next()
         }else{
-            res.redirect('/login')
+            // res.redirect('/login')
+            next()
         }
     }
 });

@@ -84,6 +84,8 @@
             let {errcode,message} = res;
             if(errcode==0){
                 layer.msg(`欢迎：${username}回家`)
+                // 把用户名存储到本地存储，实现跨页面共享数据
+                localStorage.setItem('username',username)
                 location.href = '/'
             }else{
                 layer.msg(message)

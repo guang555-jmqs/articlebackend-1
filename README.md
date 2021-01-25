@@ -108,4 +108,69 @@ app.use(function(req,res,next){
 app.use(router)
 ```
 
+## 数据可视化-echarts使用
 
+- 基本步骤
+文档：https://echarts.apache.org/zh/api.html#echarts 
+如果快速入门建议查看菜鸟教程：https://www.runoob.com/echarts/echarts-tutorial.html
+熟悉基本使用之后，再去看官网api手册
+
+如下基本用法：
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>第一个 ECharts 实例</title>
+    <!-- 引入 echarts.js -->
+    <script src="https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1000px;height:400px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+ 
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: 'xx店铺销量清空'
+            },
+            tooltip: {},
+            legend: {
+                data:['销量']
+            },
+            xAxis: {
+                data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子","内裤",'球鞋']
+            },
+            yAxis: {},
+            series: [{
+                name: '销量',
+                type: 'bar',
+                data: [5, 20, 36, 10, 10, 20,100,2000]
+            }]
+        };
+ 
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    </script>
+</body>
+</html>
+```
+
+具体参数[查看文档](https://echarts.apache.org/zh/api.html#echarts )
+
+- 需求1：统计出每个分类的总文章数
+```sql
+SELECT
+	count(*) total,
+	t2. NAME,
+	t1.cat_id
+FROM
+	article t1
+LEFT JOIN category t2 ON t1.cat_id = t2.cat_id
+GROUP BY
+	t1.cat_id;
+```
+- 需求2：统计出当前每月的文章数
