@@ -24,12 +24,7 @@
 
       <div style="padding: 15px;">
         <h2>文章管理</h2>
-        <div>
-            <button type="button" id="add"  class="layui-btn">
-                <i class="layui-icon">&#xe608;</i> 添加文章
-            </button>
-        </div>
-       
+        
         <table class="layui-hide" id="test" lay-filter="test"></table>
       </div>
 
@@ -38,6 +33,35 @@
         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
       </script> -->
+
+      <script type="text/html" id="leftContent">
+        <div  style="display:flex;">
+            <button type="button" id="add" style="margin-right:50px"  class="layui-btn layui-btn-normal">
+                <i class="layui-icon">&#xe608;</i> 添加文章
+            </button>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">标题</label>
+                <div class="layui-input-inline">
+                  <input type="text" name="title" id="title" required placeholder="请输入标题" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline">
+                  <select id="status" name="status" lay-verify="required">
+                    <option value="">全部</option>
+                    <option value="0">未发布</option>
+                    <option value="1">已发布</option>
+                    <option value="2">不通过</option>
+                  </select>
+                </div>
+              </div>
+         
+          <button class="layui-btn" id="search">搜索</button>
+        </div>
+      </script>
 
 
     </div>
@@ -49,16 +73,7 @@
   {{ include './common/scriptjs.html' }}
   <script src="/public/js/lightbox-plus-jquery.min.js"></script>
   <script>
-    // NProgress.set(0.4);// 默认设置40% NProgress.set(0) 等价与 NProgress.start()
-    // let interval = setInterval(function(){
-    //     NProgress.inc(); // 以小量递增
-    // },200)
-
-    // $(window).on('load',()=>{
-    //     clearInterval(interval)
-    //     NProgress.done()
-    // })
-
+  
     //JavaScript代码区域
     layui.use(['element', 'table'], function () {
       var element = layui.element;
@@ -68,7 +83,8 @@
         elem: '#test',
         url: '/allarticle',
         cellMinWidth: 100,
-        toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+        id:"testReload",
+        toolbar: '#leftContent' //开启头部工具栏，并为其绑定左侧模板
           ,
         defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
           title: '提示',
@@ -155,7 +171,7 @@
           }, {
             fixed: 'right',
             title: '操作',
-            // toolbar: '#barDemo',1
+            // toolbar: '#barDemo',
             templet({status}){
               let temStr = `<a class="layui-btn layui-btn-xs" lay-event="show">查看内容</a>`;
               // 当前状态是0，说明是未发布，我们可以对其进行审核
@@ -271,8 +287,6 @@
         });
       }
 
-
-
       // 更新文章状态
       function updArtStatus(art_id,status){
         $.post('/updstatus',{art_id,status},({errcode,message})=>{
@@ -282,14 +296,32 @@
           layer.msg(message)
         },'json')
       }
-
       
-
       // 跳转到文章添加页面
       $("#add").on('click',()=>{
         location.href = '/addart'
       })
 
+      //单击搜索进行表格筛选，让表格进行重载
+      $('body').on('click','#search',function(){
+			// 重载表格，携带查询条件
+			let title = $('#title').val();
+			let status = $('#status').val();
+			//执行重载
+			table.reload('testReload', {
+				page: {
+				curr: 1 //重新从第 1 页开始
+				}
+				,where: {
+				title,status
+				}
+			});
+			// 给搜索框保留搜索条件的值，在赋值回去即可
+			// alert(title)
+			$('#title').val(title);
+			$('#status').val(status);
+        })
+        
     });
   </script>
 </body>

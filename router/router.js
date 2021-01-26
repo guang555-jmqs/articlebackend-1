@@ -25,6 +25,14 @@ router.get('/cateCount',async (req,res)=>{
     res.json(data)
 })
 
+// 统计出当前的每月的文章总数
+router.get('/artCount',async (req,res)=>{
+    let sql = `select month(publish_date) month,count(*) as total from article 
+    where year(publish_date) = year(now()) group by month(publish_date)`
+    let data = await model(sql);
+    res.json(data)
+})
+
 // 匹配 / 或 /admin
 router.get(/^\/$|^\/admin$/,(req,res)=>{
     // let data = {

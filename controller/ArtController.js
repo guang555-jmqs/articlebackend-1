@@ -18,13 +18,19 @@ const {delsucc,delfail,exception,argsfail,addsucc,addfail,getsucc,getfail,updsuc
 // 获取分页的文章数据
 ArticleController.allArticle = async (req,res)=>{
     //1. 接收查询字符串,给limit取别名
-    let {page,limit:pagesize} = req.query;
+    let {page,limit:pagesize,title,status} = req.query;
+    // 定义查询条件
+    let where = 'where 1';
+    // 有值（为真）才拼接查询条件
+    title && (where += ` and t1.title like '%${title}%'`)
+    status && (where += ` and t1.status='${status}'`)
+    
     //2.编写sql语句
     let offset = (page - 1)*pagesize;
     let sql = `select t1.*,t2.name from article t1 left join category t2 on t1.cat_id = t2.cat_id
-    
+                ${where}
                 order by t1.art_id desc limit ${offset},${pagesize} `;
-    let sql2 = `select count(*) as count from article;`
+    let sql2 = `select count(*) as count from article t1 ${where}`
     let promise1 =  model(sql); // [{},{},{}]
     let promise2 =  model(sql2); // [{count:16}]
     // 并行
