@@ -48,7 +48,6 @@
         </form>
     </div>
   </div>
-  
     <!-- 引入左边侧边栏 -->
     {{ include './common/footer.html' }}
   
@@ -65,7 +64,6 @@ layui.use(['element','form','layer','laydate'], function(){
   
   //监听提交
   form.on('submit(formDemo)', function(data){
-    // console.log(data);return false;
     // 表单验证成功后触发这里，data.field是我们的表单数据 
     // data.elem:是当前点击的提交按钮的dom对象
     // 发送ajax请求，进行数据入库

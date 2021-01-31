@@ -59,8 +59,8 @@ app.use(function(req,res,next){
             // 有权限，可以继续操作
             next()
         }else{
-            // res.redirect('/login')
-            next()
+            res.redirect('/login')
+            // next()
         }
     }
 });

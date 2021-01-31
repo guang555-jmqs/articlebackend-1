@@ -28,21 +28,25 @@
       <li class="layui-nav-item"><a id="logout" href="javascript:;">退出系统</a></li>
     </ul>
   </div>
-  <script src="/public/js/jquery.js"></script>
-  <script src="/public/layui/layui.all.js"></script>
   <script>
-    let layer = layui.layer;
-    // 设置当前用户的信息
-    document.getElementById('username').innerHTML = localStorage.getItem('username');
-    // 退出
-    document.getElementById('logout').onclick = function(){
-      // 清空session(需要发送ajax请求)
-      $.get('/logout',(res)=>{
-        // 清空本地存储
-        localStorage.clear();
-        layer.msg(res.message)
-        location.href = '/login'
+    window.onload = function(){
+      layui.use(['layer'],function(){
+        let layer = layui.layer;
+        // 设置当前用户的信息
+        document.getElementById('username').innerHTML = localStorage.getItem('username');
+        // 退出
+        document.getElementById('logout').onclick = function(){
+          // 清空session(需要发送ajax请求)
+          $.get('/logout',(res)=>{
+            // 清空本地存储
+            localStorage.clear();
+            layer.msg(res.message)
+            location.href = '/login'
+          })
+          
+        }
       })
-      
     }
+   
+    
   </script>
