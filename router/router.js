@@ -121,6 +121,8 @@ router.get('/login',(req,res)=>{
 // 用户登录
 router.post('/signin',UserController.signin)
 
+//更新用户头像
+router.post('/updateAvatar',UserController.updateAvatar)
 
 // 用户退出
 router.get('/logout',(req,res)=>{

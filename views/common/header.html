@@ -18,25 +18,72 @@
       <li class="layui-nav-item">
         <a href="javascript:;">
           <img id="avatar" src="" class="layui-nav-img" alt="暂无头像">
-           <span id="username">匿名</span>
+           <span id="username"></span>
         </a>
         <dl class="layui-nav-child">
-          <dd><a href="">基本资料</a></dd>
+          <dd><a href="javascript:;" onclick="showUserInfo()">基本资料</a></dd>
           <dd><a href="">安全设置</a></dd>
         </dl>
       </li>
       <li class="layui-nav-item"><a id="logout" href="javascript:;">退出系统</a></li>
     </ul>
+
+    <!-- 用户信息的模板 -->
+    <!-- <div id="userInfoTpl" style="">
+     
+
+      
+      
+    </div> -->
+
   </div>
   <script>
+    
+    let userInfoTpl = `
+      <form id="userInfoTpl"  class="layui-form" action="" style="padding:20px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-inline">
+              <!-- <input type="text" name="username" class="layui-input" disabled  autocomplete="off" > -->
+              <div id="form-username" style="display:flex;align-items: center;" class="layui-input"></div>
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">头像</label>
+            <div class="layui-input-inline">
+                <img src="" alt="" id='avatar-preview' style="width:100px">
+            </div>
+            <button type="button" class="layui-btn" id="uploadAvatar">上传图片</button>
+           
+          </div>
+          
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">保存</button>
+              <button type="reset" class="layui-btn layui-btn-primary">取消</button>
+            </div>
+          </div>
+        </form>`;
+
     window.onload = function(){
-      layui.use(['layer'],function(){
+
+      
+      let userInfo =  JSON.parse(localStorage.getItem('userInfo') || '{}');
+      let avatar = userInfo.avatar || '/public/images/default.png';
+
+      // 设置header.html登录用户的信息
+      document.getElementById('username').innerHTML = userInfo.username
+      document.getElementById('avatar').src = avatar
+
+      //回显用户名到个人信息表单中
+      $("#form-username").html(userInfo.username)
+     
+      layui.use(['layer','form','upload'],function(){
         let layer = layui.layer;
-        // 设置当前用户的信息
-        let userInfo =  JSON.parse(localStorage.getItem('userInfo') || '{}');
-        document.getElementById('username').innerHTML = userInfo.username
-        let defaultAvatar = '/public/images/default.png';
-        document.getElementById('avatar').src = userInfo.avatar || defaultAvatar
+        let form = layui.form;
+        let upload = layui.upload;
+
+  
         // 退出
         document.getElementById('logout').onclick = function(){
           // 清空session(需要发送ajax请求)
@@ -48,8 +95,68 @@
           })
           
         }
+
+         // 在一弹出中显示用户的信息
+        function showUserInfo(){
+            //页面层(弹窗)
+            layer.open({
+              title:"个人信息",
+              type: 1,
+              skin: 'layui-layer-rim', //加上边框
+              area: ['720px', '640px'], //宽高
+              // 这样会有两个一样的html结构
+              content: userInfoTpl,
+              // content:['userInfo.html', 'no'],
+              success:function(){
+                // 修改上传头像
+                $("#userInfoTpl").find('#form-username').html(userInfo.username)
+                $("#userInfoTpl #avatar-preview").attr('src',avatar)
+                
+                initUpload(upload,layer);
+              }
+            });
+        }
+        // 暴露给全局，外面可以调用
+        window['showUserInfo'] = showUserInfo
+
+
       })
+    
     }
    
+   
+
+    function initUpload(upload,layer){
+      // 初始化文件上传组件
+      var uploadInst = upload.render({
+          elem: '#uploadAvatar'
+          ,url: '/upload' //改成您自己的上传接口
+          ,done: function(res){
+            //如果上传失败
+            console.log(res)
+            if(res.code == 0){
+              let src = res.src;
+              $("#userInfoTpl #avatar-preview").attr('src',src)
+              // layer.msg(res.message);
+              // 要去更新用户的头像upload
+              // 不需要传递user_id,因为user_id在服务端session中保存着
+              $.post('/updateAvatar',{avatar:src},(res)=>{
+                console.log(res)
+                let {code,message} = res;
+                // 成功之后，需要把网页头部的头像改成修改之后的头像
+                if(code == 0){
+                  layer.msg(message);
+                  $("#avatar").attr('src',src)
+                  // 还需要更新本地存储中的头像
+                  let olduserInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+                  olduserInfo.avatar = src;
+                  localStorage.setItem('userInfo',JSON.stringify(olduserInfo))
+                }
+              },'json')
+            }
+          },
+      });
+    }
     
+   
   </script>
