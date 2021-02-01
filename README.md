@@ -247,3 +247,11 @@ select CONCAT(month(publish_date),'月') month,count(*) as total from article  w
 select title,status from article where 1 and  title like '%b%' and status = 0;
 ```
 > where 1 仅仅是为了拼接多个查询条件，从而避免没有查询条件时的出错。
+
+
+## 更新用户最后的登录时间
+
+登录系统之后，在首页显示当前用户，并提示最后的登录时间。
+
+实现思路：
+- 用户登录成功之后，即把当前的时间更新到用户表的last_login_date字段

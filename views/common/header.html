@@ -17,7 +17,7 @@
     <ul class="layui-nav layui-layout-right">
       <li class="layui-nav-item">
         <a href="javascript:;">
-          <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+          <img id="avatar" src="" class="layui-nav-img" alt="暂无头像">
            <span id="username">匿名</span>
         </a>
         <dl class="layui-nav-child">
@@ -33,7 +33,10 @@
       layui.use(['layer'],function(){
         let layer = layui.layer;
         // 设置当前用户的信息
-        document.getElementById('username').innerHTML = localStorage.getItem('username');
+        let userInfo =  JSON.parse(localStorage.getItem('userInfo') || '{}');
+        document.getElementById('username').innerHTML = userInfo.username
+        let defaultAvatar = '/public/images/default.png';
+        document.getElementById('avatar').src = userInfo.avatar || defaultAvatar
         // 退出
         document.getElementById('logout').onclick = function(){
           // 清空session(需要发送ajax请求)
