@@ -3,10 +3,17 @@ const path = require('path');
 const app = express();
 // 引入session会话技术
 let session = require('express-session');
+let cors = require('cors');
+
+
+// 设置跨域
+app.use(cors())
+
 
 
 
 // 导入路由模块
+const apiRouter = require('./router/apiRouter.js')
 const router = require('./router/router.js')
 
 app.use(express.json()) // for parsing application/json
@@ -42,6 +49,9 @@ let options = {
     }
 };
 app.use( session(options) )
+
+// 前台路由
+app.use('/api',apiRouter);
 
 // 在进入到路由匹配函数之前，要进行验证权限
 app.use(function(req,res,next){

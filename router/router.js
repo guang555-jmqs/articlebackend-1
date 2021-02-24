@@ -9,7 +9,6 @@ let upload = multer({ dest: 'uploads/' })
 // 导入model,相当于模型执行sql语句，
 const model = require('../model/model.js');
 
-
 // 导入相应的控制器
 const CateController = require('../controller/CateController.js');
 const ArtController = require('../controller/ArtController.js');
